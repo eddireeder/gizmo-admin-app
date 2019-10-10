@@ -107,6 +107,17 @@ class SoundSelector extends React.Component {
     this.setState(newState);
   }
 
+  getFilteredSounds() {
+    // If the search field contains characters
+    if (this.state.soundFilters.search.length > 0) {
+      const lowercaseSearch = this.state.soundFilters.search.toLowerCase();
+      return this.state.sounds.filter(
+        sound => sound.description.toLowerCase().indexOf(lowercaseSearch) !== -1
+      );
+    }
+    return [];
+  }
+
   render() {
     // Render Sound Selector
     return (
@@ -117,22 +128,22 @@ class SoundSelector extends React.Component {
           name="onlySelected"
           onChange={this.handleOnlySelectedChange}
         />
-        {this.state.sounds.map((sound, index) => {
-          /*
-          return (
-            <div className="row" key={index}>
-              <div>{sound.location}</div>
-              <div>{sound.description}</div>
-              <div>{sound.category}</div>
-              <div>{sound.cdNumber}</div>
-              <div>{sound.cdName}</div>
-              <div>{sound.trackNumber}</div>
-              <div>{sound.secs}</div>
-              <div>{sound.selected}</div>
-            </div>
-          );
-          */
-        })}
+        {this.getFilteredSounds()
+          .slice(0, 10)
+          .map((sound, index) => {
+            return (
+              <div className="row" key={index}>
+                <div>{sound.location}</div>
+                <div>{sound.description}</div>
+                <div>{sound.category}</div>
+                <div>{sound.cdNumber}</div>
+                <div>{sound.cdName}</div>
+                <div>{sound.trackNumber}</div>
+                <div>{sound.secs}</div>
+                <div>{sound.selected}</div>
+              </div>
+            );
+          })}
       </div>
     );
   }
