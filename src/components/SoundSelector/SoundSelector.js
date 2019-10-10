@@ -10,8 +10,15 @@ class SoundSelector extends React.Component {
     this.state = {
       sounds: [],
       bbcError: "",
-      serverError: ""
+      serverError: "",
+      soundFilters: {
+        search: "",
+        onlySelected: false
+      }
     };
+    // Bind functions to this class
+    this.handleSearchChange = this.handleSearchChange.bind(this);
+    this.handleOnlySelectedChange = this.handleOnlySelectedChange.bind(this);
   }
 
   async componentDidMount() {
@@ -24,7 +31,7 @@ class SoundSelector extends React.Component {
     const selectedSoundsfromServer = responses[1];
     // Create a combined array by comparing the two arrays
     let sounds = [];
-    soundsFromBBC.forEach(soundFromBBC => {
+    for (const soundFromBBC of soundsFromBBC) {
       let sound = {
         location: soundFromBBC.location,
         description: soundFromBBC.description,
@@ -36,14 +43,14 @@ class SoundSelector extends React.Component {
         selected: false
       };
       // Check whether sound exists in selected sounds
-      selectedSoundsfromServer.forEach(selectedSoundFromServer => {
-        if (soundFromBBC.location == selectedSoundFromServer.location) {
+      for (const selectedSoundfromServer of selectedSoundsfromServer) {
+        if (soundFromBBC.location === selectedSoundfromServer.location) {
           sound.selected = true;
           break;
         }
-      });
+      }
       sounds.push(sound);
-    });
+    }
     // Update state
     let newState = { ...this.state };
     newState.sounds = sounds;
@@ -82,9 +89,52 @@ class SoundSelector extends React.Component {
     }
   }
 
+  handleSearchChange(event) {
+    // Retrieve value from event
+    const value = event.target.value;
+    // Update state with new value
+    let newState = { ...this.state };
+    newState.soundFilters.search = value;
+    this.setState(newState);
+  }
+
+  handleOnlySelectedChange(event) {
+    // Retrieve value from event
+    const value = event.target.checked;
+    // Update state with new value
+    let newState = { ...this.state };
+    newState.soundFilters.onlySelected = value;
+    this.setState(newState);
+  }
+
   render() {
     // Render Sound Selector
-    return <div className="SoundSelector"></div>;
+    return (
+      <div className="SoundSelector">
+        <input type="text" name="search" onChange={this.handleSearchChange} />
+        <input
+          type="checkbox"
+          name="onlySelected"
+          onChange={this.handleOnlySelectedChange}
+        />
+        {this.state.sounds.map((sound, index) => {
+          /*
+          return (
+            <div className="row" key={index}>
+              <div>{sound.location}</div>
+              <div>{sound.description}</div>
+              <div>{sound.category}</div>
+              <div>{sound.cdNumber}</div>
+              <div>{sound.cdName}</div>
+              <div>{sound.trackNumber}</div>
+              <div>{sound.secs}</div>
+              <div>{sound.selected}</div>
+            </div>
+          );
+          */
+        })}
+      </div>
+    );
   }
 }
 

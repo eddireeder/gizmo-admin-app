@@ -15,7 +15,8 @@ class Login extends React.Component {
       authenticated: false,
       error: ""
     };
-    // Bind function to class
+    // Bind functions to class
+    this.changeHandler = this.changeHandler.bind(this);
     this.submitForm = this.submitForm.bind(this);
   }
 
