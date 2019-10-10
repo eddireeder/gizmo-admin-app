@@ -1,14 +1,17 @@
 import React from "react";
 import "./App.css";
 import { Redirect } from "react-router-dom";
-import axios from "axios";
+import SoundSelector from "../SoundSelector/SoundSelector";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     // Define initial state
     this.state = {
-      user: JSON.parse(localStorage.getItem("user"))
+      user: JSON.parse(localStorage.getItem("user")),
+      sounds: [],
+      bbcError: "",
+      serverError: ""
     };
     // Bind function to class
     this.logout = this.logout.bind(this);
@@ -23,23 +26,6 @@ class App extends React.Component {
     this.setState(newState);
   }
 
-  async getSoundsCSV() {
-    try {
-      // Make GET request to the BBC
-      const response = await axios.get(
-        "http://bbcsfx.acropolis.org.uk/assets/BBCSoundEffects.csv"
-      );
-      if (response.status === 200) {
-        // Parse the CSV response to JSON
-      }
-      console.log(response.data);
-    } catch (e) {}
-  }
-
-  componentDidMount() {
-    this.getSoundsCSV();
-  }
-
   render() {
     // Redirect if not authenticated
     if (!this.state.user) {
@@ -50,6 +36,7 @@ class App extends React.Component {
       <div className="App">
         <div>{this.state.user.username}</div>
         <button onClick={this.logout}>Log out</button>
+        <SoundSelector></SoundSelector>
       </div>
     );
   }
