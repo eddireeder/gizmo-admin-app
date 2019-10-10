@@ -1,29 +1,51 @@
-import React from 'react';
-import './App.css';
-import {Redirect} from 'react-router-dom';
+import React from "react";
+import "./App.css";
+import { Redirect } from "react-router-dom";
+import axios from "axios";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
+    // Define initial state
     this.state = {
-      user: JSON.parse(localStorage.getItem('user')),
+      user: JSON.parse(localStorage.getItem("user"))
     };
-    this.logout = this.logout.bind(this)
+    // Bind function to class
+    this.logout = this.logout.bind(this);
   }
 
   logout() {
-    localStorage.removeItem('user');
-    let newState = {...this.state};
+    // Remove user object from local storage
+    localStorage.removeItem("user");
+    // Update state
+    let newState = { ...this.state };
     newState.user = null;
     this.setState(newState);
   }
 
-  render () {
+  async getSoundsCSV() {
+    try {
+      // Make GET request to the BBC
+      const response = await axios.get(
+        "http://bbcsfx.acropolis.org.uk/assets/BBCSoundEffects.csv"
+      );
+      if (response.status === 200) {
+        // Parse the CSV response to JSON
+      }
+      console.log(response.data);
+    } catch (e) {}
+  }
+
+  componentDidMount() {
+    this.getSoundsCSV();
+  }
+
+  render() {
     // Redirect if not authenticated
     if (!this.state.user) {
-      return <Redirect to='/login'/>
+      return <Redirect to="/login" />;
     }
-
+    // Render App
     return (
       <div className="App">
         <div>{this.state.user.username}</div>
