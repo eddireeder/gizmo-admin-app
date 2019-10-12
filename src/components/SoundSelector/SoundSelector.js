@@ -108,26 +108,47 @@ class SoundSelector extends React.Component {
   }
 
   getFilteredSounds() {
-    // If the search field contains characters
-    if (this.state.soundFilters.search.length > 0) {
-      const lowercaseSearch = this.state.soundFilters.search.toLowerCase();
-      return this.state.sounds.filter(
-        sound => sound.description.toLowerCase().indexOf(lowercaseSearch) !== -1
-      );
+    // Return an empty array if no filters chosen
+    if (
+      this.state.soundFilters.search.length === 0 &&
+      !this.state.soundFilters.onlySelected
+    ) {
+      return [];
     }
-    return [];
+    // Filter by soundFilters
+    const lowercaseSearch = this.state.soundFilters.search.toLowerCase();
+    return this.state.sounds.filter(sound => {
+      // Filter by onlySelected
+      if (this.state.soundFilters.onlySelected !== sound.selected) {
+        return false;
+      }
+      // Filter by description search
+      if (
+        this.state.soundFilters.search.length > 0 &&
+        sound.description.toLowerCase().indexOf(lowercaseSearch) === -1
+      ) {
+        return false;
+      }
+      return true;
+    });
   }
 
   render() {
     // Render Sound Selector
     return (
       <div className="SoundSelector">
-        <input type="text" name="search" onChange={this.handleSearchChange} />
-        <input
-          type="checkbox"
-          name="onlySelected"
-          onChange={this.handleOnlySelectedChange}
-        />
+        <label>
+          Search by description:
+          <input type="text" name="search" onChange={this.handleSearchChange} />
+        </label>
+        <label>
+          Show only selected:
+          <input
+            type="checkbox"
+            name="onlySelected"
+            onChange={this.handleOnlySelectedChange}
+          />
+        </label>
         {this.getFilteredSounds()
           .slice(0, 10)
           .map((sound, index) => {
