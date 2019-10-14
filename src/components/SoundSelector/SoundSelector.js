@@ -14,7 +14,8 @@ class SoundSelector extends React.Component {
       soundFilters: {
         search: "",
         onlySelected: false
-      }
+      },
+      loading: true
     };
     // Bind functions to this class
     this.handleSearchChange = this.handleSearchChange.bind(this);
@@ -54,6 +55,7 @@ class SoundSelector extends React.Component {
     // Update state
     let newState = { ...this.state };
     newState.sounds = sounds;
+    newState.loading = false;
     this.setState(newState);
   }
 
@@ -119,7 +121,7 @@ class SoundSelector extends React.Component {
     const lowercaseSearch = this.state.soundFilters.search.toLowerCase();
     return this.state.sounds.filter(sound => {
       // Filter by onlySelected
-      if (this.state.soundFilters.onlySelected !== sound.selected) {
+      if (this.state.soundFilters.onlySelected && !sound.selected) {
         return false;
       }
       // Filter by description search
@@ -149,22 +151,40 @@ class SoundSelector extends React.Component {
             onChange={this.handleOnlySelectedChange}
           />
         </label>
-        {this.getFilteredSounds()
-          .slice(0, 10)
-          .map((sound, index) => {
-            return (
-              <div className="row" key={index}>
-                <div>{sound.location}</div>
-                <div>{sound.description}</div>
-                <div>{sound.category}</div>
-                <div>{sound.cdNumber}</div>
-                <div>{sound.cdName}</div>
-                <div>{sound.trackNumber}</div>
-                <div>{sound.secs}</div>
-                <div>{sound.selected}</div>
-              </div>
-            );
-          })}
+        <table>
+          <tr>
+            <th>Location</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>CD Number</th>
+            <th>CD Name</th>
+            <th>Track Number</th>
+            <th>Seconds</th>
+            <th>Selected</th>
+          </tr>
+          {this.state.loading ? (
+            <div>Loading</div>
+          ) : (
+            this.getFilteredSounds()
+              .slice(0, 10)
+              .map((sound, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{sound.location}</td>
+                    <td>{sound.description}</td>
+                    <td>{sound.category}</td>
+                    <td>{sound.cdNumber}</td>
+                    <td>{sound.cdName}</td>
+                    <td>{sound.trackNumber}</td>
+                    <td>{sound.secs}</td>
+                    <td>
+                      <input type="checkbox" checked={sound.selected} />
+                    </td>
+                  </tr>
+                );
+              })
+          )}
+        </table>
       </div>
     );
   }
