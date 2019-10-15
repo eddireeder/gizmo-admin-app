@@ -36,10 +36,13 @@ class Login extends React.Component {
     // Send log in request to the server
     try {
       const response = await axios.post(
-        "http://ec2-3-8-216-213.eu-west-2.compute.amazonaws.com/api/auth/login",
+        process.env.REACT_APP_API_URL + "/auth/login",
         {
           username: this.state.formControls.username,
           password: this.state.formControls.password
+        },
+        {
+          withCredentials: true
         }
       );
       // On success, place the returned user object in local storage

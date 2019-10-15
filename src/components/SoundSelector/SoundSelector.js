@@ -20,9 +20,18 @@ class SoundSelector extends React.Component {
     // Bind functions to this class
     this.handleSearchChange = this.handleSearchChange.bind(this);
     this.handleOnlySelectedChange = this.handleOnlySelectedChange.bind(this);
+    this.handleSelectedChange = this.handleSelectedChange.bind(this);
   }
 
   async componentDidMount() {
+    this.refreshSounds();
+  }
+
+  async refreshSounds() {
+    // Set loading state to true
+    let newState = { ...this.state };
+    newState.loading = true;
+    this.setState(newState);
     // Retrieve all sounds and selected sounds
     const responses = await Promise.all([
       this.getSoundsFromBBC(),
@@ -34,6 +43,7 @@ class SoundSelector extends React.Component {
     let sounds = [];
     for (const soundFromBBC of soundsFromBBC) {
       let sound = {
+        id: null,
         location: soundFromBBC.location,
         description: soundFromBBC.description,
         category: soundFromBBC.category,
@@ -46,6 +56,7 @@ class SoundSelector extends React.Component {
       // Check whether sound exists in selected sounds
       for (const selectedSoundfromServer of selectedSoundsfromServer) {
         if (soundFromBBC.location === selectedSoundfromServer.location) {
+          sound.id = selectedSoundfromServer.id;
           sound.selected = true;
           break;
         }
@@ -53,7 +64,7 @@ class SoundSelector extends React.Component {
       sounds.push(sound);
     }
     // Update state
-    let newState = { ...this.state };
+    newState = { ...this.state };
     newState.sounds = sounds;
     newState.loading = false;
     this.setState(newState);
@@ -79,7 +90,7 @@ class SoundSelector extends React.Component {
     try {
       // Make GET request to the server
       const response = await axios.get(
-        "http://ec2-3-8-216-213.eu-west-2.compute.amazonaws.com/api/sounds"
+        process.env.REACT_APP_API_URL + "/sounds"
       );
       // Return the array of sounds
       return response.data.sounds;
@@ -135,6 +146,59 @@ class SoundSelector extends React.Component {
     });
   }
 
+  handleSelectedChange(event, sound) {
+    // Retrieve value from event
+    const value = event.target.checked;
+    if (value) {
+      this.selectSound(sound);
+    } else {
+      this.deselectSound(sound);
+    }
+  }
+
+  async selectSound(sound) {
+    try {
+      // POST sound to the server
+      const response = await axios.post(
+        process.env.REACT_APP_API_URL + "/sounds",
+        sound,
+        {
+          withCredentials: true
+        }
+      );
+      if (response.status === 200) {
+        // Refresh the list of sounds
+        this.refreshSounds();
+      }
+    } catch (e) {
+      // Update error message in state
+      let newState = { ...this.state };
+      newState.serverError = "Could not select sound";
+      this.setState(newState);
+    }
+  }
+
+  async deselectSound(sound) {
+    try {
+      // Send DELETE request to the server
+      const response = await axios.delete(
+        process.env.REACT_APP_API_URL + "/sounds/" + sound.id,
+        {
+          withCredentials: true
+        }
+      );
+      if (response.status === 200) {
+        // Refresh the list of sounds
+        this.refreshSounds();
+      }
+    } catch (e) {
+      // Update error message in the state
+      let newState = { ...this.state };
+      newState.serverError = "Could not deselect sound";
+      this.setState(newState);
+    }
+  }
+
   render() {
     // Render Sound Selector
     return (
@@ -151,40 +215,48 @@ class SoundSelector extends React.Component {
             onChange={this.handleOnlySelectedChange}
           />
         </label>
-        <table>
-          <tr>
-            <th>Location</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>CD Number</th>
-            <th>CD Name</th>
-            <th>Track Number</th>
-            <th>Seconds</th>
-            <th>Selected</th>
-          </tr>
-          {this.state.loading ? (
-            <div>Loading</div>
-          ) : (
-            this.getFilteredSounds()
-              .slice(0, 10)
-              .map((sound, index) => {
-                return (
-                  <tr key={index}>
-                    <td>{sound.location}</td>
-                    <td>{sound.description}</td>
-                    <td>{sound.category}</td>
-                    <td>{sound.cdNumber}</td>
-                    <td>{sound.cdName}</td>
-                    <td>{sound.trackNumber}</td>
-                    <td>{sound.secs}</td>
-                    <td>
-                      <input type="checkbox" checked={sound.selected} />
-                    </td>
-                  </tr>
-                );
-              })
-          )}
-        </table>
+        {this.state.loading ? (
+          <div>Loading</div>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>CD Number</th>
+                <th>CD Name</th>
+                <th>Track Number</th>
+                <th>Seconds</th>
+                <th>Selected</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.getFilteredSounds()
+                .slice(0, 10)
+                .map((sound, index) => {
+                  return (
+                    <tr key={index}>
+                      <td>{sound.location}</td>
+                      <td>{sound.description}</td>
+                      <td>{sound.category}</td>
+                      <td>{sound.cdNumber}</td>
+                      <td>{sound.cdName}</td>
+                      <td>{sound.trackNumber}</td>
+                      <td>{sound.secs}</td>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={sound.selected}
+                          onChange={e => this.handleSelectedChange(e, sound)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        )}
       </div>
     );
   }
