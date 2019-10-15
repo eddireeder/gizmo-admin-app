@@ -12,7 +12,8 @@ class SoundSelector extends React.Component {
       bbcError: "",
       serverError: "",
       soundFilters: {
-        search: "",
+        locationSearch: "",
+        descriptionSearch: "",
         onlySelected: false
       },
       loading: true
@@ -103,11 +104,12 @@ class SoundSelector extends React.Component {
   }
 
   handleSearchChange(event) {
-    // Retrieve value from event
+    // Retrieve name and value from event
     const value = event.target.value;
+    const name = event.target.name;
     // Update state with new value
     let newState = { ...this.state };
-    newState.soundFilters.search = value;
+    newState.soundFilters[name] = value;
     this.setState(newState);
   }
 
@@ -121,24 +123,26 @@ class SoundSelector extends React.Component {
   }
 
   getFilteredSounds() {
-    // Return an empty array if no filters chosen
-    if (
-      this.state.soundFilters.search.length === 0 &&
-      !this.state.soundFilters.onlySelected
-    ) {
-      return [];
-    }
     // Filter by soundFilters
-    const lowercaseSearch = this.state.soundFilters.search.toLowerCase();
+    const lowercaseLocationSearch = this.state.soundFilters.locationSearch.toLowerCase();
+    const lowercaseDescriptionSearch = this.state.soundFilters.descriptionSearch.toLowerCase();
     return this.state.sounds.filter(sound => {
       // Filter by onlySelected
       if (this.state.soundFilters.onlySelected && !sound.selected) {
         return false;
       }
+      // Filter by location search
+      if (
+        lowercaseLocationSearch.length > 0 &&
+        sound.location.toLowerCase().indexOf(lowercaseLocationSearch) === -1
+      ) {
+        return false;
+      }
       // Filter by description search
       if (
-        this.state.soundFilters.search.length > 0 &&
-        sound.description.toLowerCase().indexOf(lowercaseSearch) === -1
+        lowercaseDescriptionSearch.length > 0 &&
+        sound.description.toLowerCase().indexOf(lowercaseDescriptionSearch) ===
+          -1
       ) {
         return false;
       }
@@ -204,8 +208,20 @@ class SoundSelector extends React.Component {
     return (
       <div className="SoundSelector">
         <label>
+          Search by location:
+          <input
+            type="text"
+            name="locationSearch"
+            onChange={this.handleSearchChange}
+          />
+        </label>
+        <label>
           Search by description:
-          <input type="text" name="search" onChange={this.handleSearchChange} />
+          <input
+            type="text"
+            name="descriptionSearch"
+            onChange={this.handleSearchChange}
+          />
         </label>
         <label>
           Show only selected:
