@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { Redirect } from "react-router-dom";
 import SoundSelector from "../SoundSelector/SoundSelector";
+import Configuration from "../Configuration/Configuration";
 
 class App extends React.Component {
   constructor(props) {
@@ -14,10 +15,10 @@ class App extends React.Component {
       serverError: ""
     };
     // Bind function to class
-    this.logout = this.logout.bind(this);
+    this.logOut = this.logOut.bind(this);
   }
 
-  logout() {
+  logOut() {
     // Remove user object from local storage
     localStorage.removeItem("user");
     // Update state
@@ -35,7 +36,8 @@ class App extends React.Component {
     return (
       <div className="App">
         <div>{this.state.user.username}</div>
-        <button onClick={this.logout}>Log out</button>
+        <button onClick={this.logOut}>Log out</button>
+        <Configuration></Configuration>
         <SoundSelector></SoundSelector>
       </div>
     );
