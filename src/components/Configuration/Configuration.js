@@ -14,18 +14,22 @@ class Configuration extends React.Component {
       configuration: {
         primaryAngle: null,
         secondaryAngle: null,
-        timeToFocus: null
+        timeToFocus: null,
+        minAngleBetweenSounds: null
       },
       formControls: {
         primaryAngle: null,
         secondaryAngle: null,
-        timeToFocus: null
-      }
+        timeToFocus: null,
+        minAngleBetweenSounds: null
+      },
+      regenerateSoundDirectionsButtonDisabled: false
     };
     // Bind functions to class
     this.changeHandler = this.changeHandler.bind(this);
     this.submitForm = this.submitForm.bind(this);
     this.canSubmit = this.canSubmit.bind(this);
+    this.regenerateSoundDirections = this.regenerateSoundDirections.bind(this);
   }
 
   async componentDidMount() {
@@ -74,13 +78,48 @@ class Configuration extends React.Component {
         this.setState(newState);
       }
     } catch (e) {
-      // Log out if unauthorised if unauthorised
+      // Log out if unauthorised
       if (e.response.status === 401) {
         this.logOut();
       } else {
         // Update error message in state
         let newState = { ...this.state };
         newState.serverError = "Could not send configuration to the server";
+        this.setState(newState);
+      }
+    }
+  }
+
+  async regenerateSoundDirections() {
+    // Disabled button
+    let newState = { ...this.state };
+    newState.regenerateSoundDirectionsButtonDisabled = true;
+    this.setState(newState);
+    try {
+      // Send POST request to server endpoint
+      const response = await axios.post(
+        process.env.REACT_APP_API_URL + "/sounds/regenerateDirections",
+        {},
+        {
+          withCredentials: true
+        }
+      );
+      if (response.status === 200) {
+        // Remove error message, enable button and update state
+        let newState = { ...this.state };
+        newState.regenerateSoundDirectionsButtonDisabled = false;
+        newState.serverError = "";
+        this.setState(newState);
+      }
+    } catch (e) {
+      // Log out if unauthorised
+      if (e.response.status === 401) {
+        this.logOut();
+      } else {
+        // Update error message in state
+        let newState = { ...this.state };
+        newState.regenerateSoundDirectionsButtonDisabled = false;
+        newState.serverError = "Could not regenerate sound directions";
         this.setState(newState);
       }
     }
@@ -99,8 +138,14 @@ class Configuration extends React.Component {
   async submitForm(event) {
     // Prevent default form submission action
     event.preventDefault();
+    // Check whether minimum angle between sounds has been changed
+    const minAngleBetweenSoundsChanged =
+      this.state.configuration.minAngleBetweenSounds !==
+      this.state.formControls.minAngleBetweenSounds;
     // POST configuration from form to the server
     await this.postConfiguration(this.state.formControls);
+    // If the minimum angle between sounds was changed, then regenerate sound directions
+    if (minAngleBetweenSoundsChanged) await this.regenerateSoundDirections();
   }
 
   logOut() {
@@ -175,8 +220,28 @@ class Configuration extends React.Component {
               onChange={this.changeHandler}
             />
           </label>
+          <label>
+            Minimum angle between sounds
+            <input
+              type="number"
+              name="minAngleBetweenSounds"
+              defaultValue={
+                this.state.configuration
+                  ? this.state.configuration.minAngleBetweenSounds
+                  : null
+              }
+              onChange={this.changeHandler}
+            />
+          </label>
           <input type="submit" value="Save" disabled={!this.canSubmit()} />
         </form>
+        <button
+          onClick={this.regenerateSoundDirections}
+          disabled={this.state.regenerateSoundDirectionsButtonDisabled}
+        >
+          Regenerate sound directions
+        </button>
+        <div>{this.state.serverError}</div>
       </div>
     );
   }
