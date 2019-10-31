@@ -15,13 +15,19 @@ class Configuration extends React.Component {
         primaryAngle: null,
         secondaryAngle: null,
         timeToFocus: null,
-        minAngleBetweenSounds: null
+        minAngleBetweenSounds: null,
+        maxMediaPlayers: null,
+        maxIdleSensorDifference: null,
+        maxIdleSeconds: null
       },
       formControls: {
         primaryAngle: null,
         secondaryAngle: null,
         timeToFocus: null,
-        minAngleBetweenSounds: null
+        minAngleBetweenSounds: null,
+        maxMediaPlayers: null,
+        maxIdleSensorDifference: null,
+        maxIdleSeconds: null
       },
       regenerateSoundDirectionsButtonDisabled: false
     };
@@ -228,6 +234,45 @@ class Configuration extends React.Component {
               defaultValue={
                 this.state.configuration
                   ? this.state.configuration.minAngleBetweenSounds
+                  : null
+              }
+              onChange={this.changeHandler}
+            />
+          </label>
+          <label>
+            Maximum media players
+            <input
+              type="number"
+              name="maxMediaPlayers"
+              defaultValue={
+                this.state.configuration
+                  ? this.state.configuration.maxMediaPlayers
+                  : null
+              }
+              onChange={this.changeHandler}
+            />
+          </label>
+          <label>
+            Maximum idle sensor difference
+            <input
+              type="number"
+              name="maxIdleSensorDifference"
+              defaultValue={
+                this.state.configuration
+                  ? this.state.configuration.maxIdleSensorDifference
+                  : null
+              }
+              onChange={this.changeHandler}
+            />
+          </label>
+          <label>
+            Maximum idle seconds
+            <input
+              type="number"
+              name="maxIdleSeconds"
+              defaultValue={
+                this.state.configuration
+                  ? this.state.configuration.maxIdleSeconds
                   : null
               }
               onChange={this.changeHandler}
