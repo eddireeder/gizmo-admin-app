@@ -256,6 +256,7 @@ class Configuration extends React.Component {
             Maximum idle sensor difference
             <input
               type="number"
+              step="0.001"
               name="maxIdleSensorDifference"
               defaultValue={
                 this.state.configuration

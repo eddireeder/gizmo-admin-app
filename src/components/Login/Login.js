@@ -33,6 +33,10 @@ class Login extends React.Component {
   async submitForm(event) {
     // Prevent default form submission action
     event.preventDefault();
+    // Remove any error message
+    let newState = { ...this.state };
+    newState.error = "";
+    this.setState(newState);
     // Send log in request to the server
     try {
       const response = await axios.post(
@@ -81,18 +85,23 @@ class Login extends React.Component {
       <div className="Login">
         <form onSubmit={this.submitForm}>
           <input
+            className="input"
             type="text"
             placeholder="Username"
             name="username"
             onChange={this.changeHandler}
           />
           <input
+            className="input"
             type="password"
             placeholder="Password"
             name="password"
             onChange={this.changeHandler}
           />
-          <input type="submit" value="Log in" />
+          {this.state.error.length > 0 && (
+            <div className="error">{this.state.error}</div>
+          )}
+          <input className="button" type="submit" value="Log in" />
         </form>
       </div>
     );
