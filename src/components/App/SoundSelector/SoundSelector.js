@@ -6,6 +6,8 @@ import csvtojson from "csvtojson";
 class SoundSelector extends React.Component {
   constructor(props) {
     super(props);
+    // Set component mounted
+    this._isMounted = false;
     // Define initial state
     this.state = {
       sounds: [],
@@ -25,7 +27,15 @@ class SoundSelector extends React.Component {
   }
 
   async componentDidMount() {
+    // Set component mounted
+    this._isMounted = true;
+    // Refresh sound list
     this.refreshSounds();
+  }
+
+  async componentWillUnmount() {
+    // Set component mounted
+    this._isMounted = false;
   }
 
   async refreshSounds() {
@@ -68,7 +78,7 @@ class SoundSelector extends React.Component {
     newState = { ...this.state };
     newState.sounds = sounds;
     newState.loading = false;
-    this.setState(newState);
+    this._isMounted && this.setState(newState);
   }
 
   async getSoundsFromBBC() {
@@ -83,7 +93,7 @@ class SoundSelector extends React.Component {
       // Update error message in state
       let newState = { ...this.state };
       newState.bbcError = "Could not retrieve sounds from BBC";
-      this.setState(newState);
+      this._isMounted && this.setState(newState);
     }
   }
 
@@ -99,7 +109,7 @@ class SoundSelector extends React.Component {
       // Update error message in state
       let newState = { ...this.state };
       newState.serverError = "Could not retrieve sounds from the server";
-      this.setState(newState);
+      this._isMounted && this.setState(newState);
     }
   }
 
@@ -178,7 +188,7 @@ class SoundSelector extends React.Component {
       // Update error message in state
       let newState = { ...this.state };
       newState.serverError = "Could not select sound";
-      this.setState(newState);
+      this._isMounted && this.setState(newState);
     }
   }
 
@@ -199,7 +209,7 @@ class SoundSelector extends React.Component {
       // Update error message in the state
       let newState = { ...this.state };
       newState.serverError = "Could not deselect sound";
-      this.setState(newState);
+      this._isMounted && this.setState(newState);
     }
   }
 

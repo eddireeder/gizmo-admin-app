@@ -1,8 +1,8 @@
 import React from "react";
 import "./App.css";
 import { Redirect } from "react-router-dom";
-import SoundSelector from "../SoundSelector/SoundSelector";
-import Configuration from "../Configuration/Configuration";
+import SoundSelector from "./SoundSelector/SoundSelector";
+import Configuration from "./Configuration/Configuration";
 
 class App extends React.Component {
   constructor(props) {
@@ -30,7 +30,7 @@ class App extends React.Component {
   render() {
     // Redirect if not authenticated
     if (!this.state.user) {
-      return <Redirect to="/login" />;
+      return <Redirect to="/login"></Redirect>;
     }
     // Render App
     return (

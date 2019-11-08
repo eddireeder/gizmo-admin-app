@@ -6,6 +6,8 @@ import axios from "axios";
 class Login extends React.Component {
   constructor(props) {
     super(props);
+    // Set component mounted
+    this._isMounted = false;
     // Define state
     this.state = {
       formControls: {
@@ -18,6 +20,16 @@ class Login extends React.Component {
     // Bind functions to class
     this.changeHandler = this.changeHandler.bind(this);
     this.submitForm = this.submitForm.bind(this);
+  }
+
+  async componentDidMount() {
+    // Set component mounted
+    this._isMounted = true;
+  }
+
+  async componentWillUnmount() {
+    // Set component mounted
+    this._isMounted = false;
   }
 
   changeHandler(event) {
@@ -71,7 +83,7 @@ class Login extends React.Component {
       // Update state
       let newState = { ...this.state };
       newState.error = message;
-      this.setState(newState);
+      this._isMounted && this.setState(newState);
     }
   }
 

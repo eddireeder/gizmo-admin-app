@@ -7,6 +7,8 @@ import _ from "lodash";
 class Configuration extends React.Component {
   constructor(props) {
     super(props);
+    // Set component mounted
+    this._isMounted = false;
     // Define initial state
     this.state = {
       authenticated: true,
@@ -39,6 +41,8 @@ class Configuration extends React.Component {
   }
 
   async componentDidMount() {
+    // Set component mounted
+    this._isMounted = true;
     // Try to get configuration from the server
     const configuration = await this.getConfiguration();
     // Update starting form values and the configuration state
@@ -48,6 +52,11 @@ class Configuration extends React.Component {
       newState.formControls = { ...configuration };
       this.setState(newState);
     }
+  }
+
+  async componentWillUnmount() {
+    // Set component mounted
+    this._isMounted = false;
   }
 
   async getConfiguration() {
@@ -62,7 +71,7 @@ class Configuration extends React.Component {
       // Update error message in state
       let newState = { ...this.state };
       newState.serverError = "Could not retrieve configuration from the server";
-      this.setState(newState);
+      this._isMounted && this.setState(newState);
     }
   }
 
@@ -81,7 +90,7 @@ class Configuration extends React.Component {
         let newState = { ...this.state };
         newState.serverError = "";
         newState.configuration = { ...configuration };
-        this.setState(newState);
+        this._isMounted && this.setState(newState);
       }
     } catch (e) {
       // Log out if unauthorised
@@ -91,7 +100,7 @@ class Configuration extends React.Component {
         // Update error message in state
         let newState = { ...this.state };
         newState.serverError = "Could not send configuration to the server";
-        this.setState(newState);
+        this._isMounted && this.setState(newState);
       }
     }
   }
@@ -100,7 +109,7 @@ class Configuration extends React.Component {
     // Disabled button
     let newState = { ...this.state };
     newState.regenerateSoundDirectionsButtonDisabled = true;
-    this.setState(newState);
+    this._isMounted && this.setState(newState);
     try {
       // Send POST request to server endpoint
       const response = await axios.post(
@@ -115,7 +124,7 @@ class Configuration extends React.Component {
         let newState = { ...this.state };
         newState.regenerateSoundDirectionsButtonDisabled = false;
         newState.serverError = "";
-        this.setState(newState);
+        this._isMounted && this.setState(newState);
       }
     } catch (e) {
       // Log out if unauthorised
@@ -126,7 +135,7 @@ class Configuration extends React.Component {
         let newState = { ...this.state };
         newState.regenerateSoundDirectionsButtonDisabled = false;
         newState.serverError = "Could not regenerate sound directions";
-        this.setState(newState);
+        this._isMounted && this.setState(newState);
       }
     }
   }
