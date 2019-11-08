@@ -35,10 +35,19 @@ class App extends React.Component {
     // Render App
     return (
       <div className="App">
-        <div>{this.state.user.username}</div>
-        <button onClick={this.logOut}>Log out</button>
-        <Configuration></Configuration>
-        <SoundSelector></SoundSelector>
+        <div className="topbar">
+          <div>{this.state.user.username}</div>
+          <button className="logoutButton" onClick={this.logOut}>
+            Log out
+          </button>
+        </div>
+        <div className="main-content">
+          <h2>Options</h2>
+          <Configuration></Configuration>
+          <div className="line"></div>
+          <h2>Sound Selector</h2>
+          <SoundSelector></SoundSelector>
+        </div>
       </div>
     );
   }

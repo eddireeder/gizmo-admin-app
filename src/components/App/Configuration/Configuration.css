@@ -1,0 +1,35 @@
+.Configuration > form {
+  display: flex;
+  flex-direction: column;
+}
+
+.Configuration > form > label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.Configuration > form > .buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.Configuration .save {
+  padding: 0 1rem;
+}
+
+.Configuration .save:disabled {
+  background-color: lightgrey;
+  cursor: initial;
+}
+
+.Configuration .regenerate-sound-directions {
+  padding: 0 1rem;
+}
+
+.Configuration .regenerate-sound-directions:disabled {
+  background-color: lightgrey;
+  cursor: initial;
+}

@@ -16,29 +16,6 @@
   font-size: 0.7rem;
 }
 
-.Login > form > input {
-  border-radius: 0.2rem;
-}
-
-.Login > form > .input {
-  padding-left: 1rem;
-  border: none;
-  background-color: #f1f1f1;
-  height: 2rem;
-}
-
-.Login > form > .button {
-  height: 2rem;
-  border: none;
-  background-color: #6091ff;
-  color: white;
-  font-weight: bold;
-}
-
-.Login > form > .button:hover {
-  cursor: pointer;
-}
-
 .Login > form > .error {
   color: red;
   text-align: center;

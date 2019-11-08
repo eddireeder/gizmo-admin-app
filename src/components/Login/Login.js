@@ -113,7 +113,7 @@ class Login extends React.Component {
           {this.state.error.length > 0 && (
             <div className="error">{this.state.error}</div>
           )}
-          <input className="button" type="submit" value="Log in" />
+          <input className="input button" type="submit" value="Log in" />
         </form>
       </div>
     );

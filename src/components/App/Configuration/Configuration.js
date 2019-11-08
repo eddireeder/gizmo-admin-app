@@ -31,7 +31,7 @@ class Configuration extends React.Component {
         maxIdleSensorDifference: null,
         maxIdleSeconds: null
       },
-      regenerateSoundDirectionsButtonDisabled: false
+      loading: false
     };
     // Bind functions to class
     this.changeHandler = this.changeHandler.bind(this);
@@ -47,9 +47,19 @@ class Configuration extends React.Component {
     const configuration = await this.getConfiguration();
     // Update starting form values and the configuration state
     if (configuration) {
+      // Stringify configuration values
+      let configurationStringified = { ...configuration };
+      for (const key in configurationStringified) {
+        if (configurationStringified.hasOwnProperty(key)) {
+          configurationStringified[key] = configurationStringified[
+            key
+          ].toString();
+        }
+      }
+      // Update state
       let newState = { ...this.state };
-      newState.configuration = { ...configuration };
-      newState.formControls = { ...configuration };
+      newState.configuration = { ...configurationStringified };
+      newState.formControls = { ...configurationStringified };
       this.setState(newState);
     }
   }
@@ -60,22 +70,35 @@ class Configuration extends React.Component {
   }
 
   async getConfiguration() {
+    // Set as loading
+    let newState = { ...this.state };
+    newState.loading = true;
+    this._isMounted && this.setState(newState);
     try {
       // Make GET request to the server
       const response = await axios.get(
         process.env.REACT_APP_API_URL + "/configuration"
       );
+      // Set not loading
+      let newState = { ...this.state };
+      newState.loading = false;
+      this._isMounted && this.setState(newState);
       // Return configuration
       return response.data.configuration;
     } catch (e) {
-      // Update error message in state
+      // Update error message in state and not loading
       let newState = { ...this.state };
       newState.serverError = "Could not retrieve configuration from the server";
+      newState.loading = false;
       this._isMounted && this.setState(newState);
     }
   }
 
   async postConfiguration(configuration) {
+    // Set as loading
+    let newState = { ...this.state };
+    newState.loading = true;
+    this._isMounted && this.setState(newState);
     try {
       // Send POST request to server
       const response = await axios.post(
@@ -86,8 +109,9 @@ class Configuration extends React.Component {
         }
       );
       if (response.status === 200) {
-        // Remove error message and update configuration state
+        // Remove error message, update configuration state and set not loading
         let newState = { ...this.state };
+        newState.loading = false;
         newState.serverError = "";
         newState.configuration = { ...configuration };
         this._isMounted && this.setState(newState);
@@ -97,8 +121,9 @@ class Configuration extends React.Component {
       if (e.response.status === 401) {
         this.logOut();
       } else {
-        // Update error message in state
+        // Update error message in state and set not loading
         let newState = { ...this.state };
+        newState.loading = false;
         newState.serverError = "Could not send configuration to the server";
         this._isMounted && this.setState(newState);
       }
@@ -106,9 +131,9 @@ class Configuration extends React.Component {
   }
 
   async regenerateSoundDirections() {
-    // Disabled button
+    // Set as loading
     let newState = { ...this.state };
-    newState.regenerateSoundDirectionsButtonDisabled = true;
+    newState.loading = true;
     this._isMounted && this.setState(newState);
     try {
       // Send POST request to server endpoint
@@ -122,7 +147,7 @@ class Configuration extends React.Component {
       if (response.status === 200) {
         // Remove error message, enable button and update state
         let newState = { ...this.state };
-        newState.regenerateSoundDirectionsButtonDisabled = false;
+        newState.loading = false;
         newState.serverError = "";
         this._isMounted && this.setState(newState);
       }
@@ -133,7 +158,7 @@ class Configuration extends React.Component {
       } else {
         // Update error message in state
         let newState = { ...this.state };
-        newState.regenerateSoundDirectionsButtonDisabled = false;
+        newState.loading = false;
         newState.serverError = "Could not regenerate sound directions";
         this._isMounted && this.setState(newState);
       }
@@ -199,6 +224,7 @@ class Configuration extends React.Component {
           <label>
             Primary Angle
             <input
+              className="input"
               type="number"
               name="primaryAngle"
               defaultValue={
@@ -212,6 +238,7 @@ class Configuration extends React.Component {
           <label>
             Secondary Angle
             <input
+              className="input"
               type="number"
               name="secondaryAngle"
               defaultValue={
@@ -225,6 +252,7 @@ class Configuration extends React.Component {
           <label>
             Time to focus
             <input
+              className="input"
               type="number"
               name="timeToFocus"
               defaultValue={
@@ -238,6 +266,7 @@ class Configuration extends React.Component {
           <label>
             Minimum angle between sounds
             <input
+              className="input"
               type="number"
               name="minAngleBetweenSounds"
               defaultValue={
@@ -251,6 +280,7 @@ class Configuration extends React.Component {
           <label>
             Maximum media players
             <input
+              className="input"
               type="number"
               name="maxMediaPlayers"
               defaultValue={
@@ -264,6 +294,7 @@ class Configuration extends React.Component {
           <label>
             Maximum idle sensor difference
             <input
+              className="input"
               type="number"
               step="0.001"
               name="maxIdleSensorDifference"
@@ -278,6 +309,7 @@ class Configuration extends React.Component {
           <label>
             Maximum idle seconds
             <input
+              className="input"
               type="number"
               name="maxIdleSeconds"
               defaultValue={
@@ -288,14 +320,22 @@ class Configuration extends React.Component {
               onChange={this.changeHandler}
             />
           </label>
-          <input type="submit" value="Save" disabled={!this.canSubmit()} />
+          <div className="buttons">
+            <button
+              className="input button regenerate-sound-directions"
+              onClick={this.regenerateSoundDirections}
+              disabled={this.state.loading}
+            >
+              Regenerate sound directions
+            </button>
+            <input
+              className="input save button"
+              type="submit"
+              value="Save"
+              disabled={!this.canSubmit() || this.state.loading}
+            />
+          </div>
         </form>
-        <button
-          onClick={this.regenerateSoundDirections}
-          disabled={this.state.regenerateSoundDirectionsButtonDisabled}
-        >
-          Regenerate sound directions
-        </button>
         <div>{this.state.serverError}</div>
       </div>
     );

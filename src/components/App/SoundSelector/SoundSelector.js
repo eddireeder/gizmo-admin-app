@@ -220,6 +220,7 @@ class SoundSelector extends React.Component {
         <label>
           Search by location:
           <input
+            className="input"
             type="text"
             name="locationSearch"
             onChange={this.handleSearchChange}
@@ -228,6 +229,7 @@ class SoundSelector extends React.Component {
         <label>
           Search by description:
           <input
+            className="input"
             type="text"
             name="descriptionSearch"
             onChange={this.handleSearchChange}
@@ -250,9 +252,6 @@ class SoundSelector extends React.Component {
                 <th>Location</th>
                 <th>Description</th>
                 <th>Category</th>
-                <th>CD Number</th>
-                <th>CD Name</th>
-                <th>Track Number</th>
                 <th>Seconds</th>
                 <th>Selected</th>
               </tr>
@@ -266,9 +265,6 @@ class SoundSelector extends React.Component {
                       <td>{sound.location}</td>
                       <td>{sound.description}</td>
                       <td>{sound.category}</td>
-                      <td>{sound.cdNumber}</td>
-                      <td>{sound.cdName}</td>
-                      <td>{sound.trackNumber}</td>
                       <td>{sound.secs}</td>
                       <td>
                         <input
