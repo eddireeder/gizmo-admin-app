@@ -16,12 +16,14 @@ class SoundSelector extends React.Component {
       soundFilters: {
         locationSearch: "",
         descriptionSearch: "",
+        onlyOnPhone: false,
         onlySelected: false
       },
       loading: true
     };
     // Bind functions to this class
     this.handleSearchChange = this.handleSearchChange.bind(this);
+    this.handleOnlyOnPhoneChange = this.handleOnlyOnPhoneChange.bind(this);
     this.handleOnlySelectedChange = this.handleOnlySelectedChange.bind(this);
     this.handleSelectedChange = this.handleSelectedChange.bind(this);
   }
@@ -43,13 +45,13 @@ class SoundSelector extends React.Component {
     let newState = { ...this.state };
     newState.loading = true;
     this.setState(newState);
-    // Retrieve all sounds and selected sounds
+    // Retrieve all sounds and downloaded sounds
     const responses = await Promise.all([
       this.getSoundsFromBBC(),
-      this.getSelectedSoundsFromServer()
+      this.getSoundsOnPhoneFromServer()
     ]);
     const soundsFromBBC = responses[0];
-    const selectedSoundsfromServer = responses[1];
+    const soundsOnPhoneFromServer = responses[1];
     // Create a combined array by comparing the two arrays
     let sounds = [];
     for (const soundFromBBC of soundsFromBBC) {
@@ -62,13 +64,15 @@ class SoundSelector extends React.Component {
         cdName: soundFromBBC.CDName,
         trackNumber: soundFromBBC.tracknum,
         secs: soundFromBBC.secs,
+        onPhone: false,
         selected: false
       };
-      // Check whether sound exists in selected sounds
-      for (const selectedSoundfromServer of selectedSoundsfromServer) {
-        if (soundFromBBC.location === selectedSoundfromServer.location) {
-          sound.id = selectedSoundfromServer.id;
-          sound.selected = true;
+      // Check whether sound exists in sounds on phone
+      for (const soundOnPhoneFromServer of soundsOnPhoneFromServer) {
+        if (soundFromBBC.location === soundOnPhoneFromServer.location) {
+          sound.id = soundOnPhoneFromServer.id;
+          sound.onPhone = true;
+          sound.selected = soundOnPhoneFromServer.selected;
           break;
         }
       }
@@ -97,7 +101,7 @@ class SoundSelector extends React.Component {
     }
   }
 
-  async getSelectedSoundsFromServer() {
+  async getSoundsOnPhoneFromServer() {
     try {
       // Make GET request to the server
       const response = await axios.get(
@@ -123,6 +127,15 @@ class SoundSelector extends React.Component {
     this.setState(newState);
   }
 
+  handleOnlyOnPhoneChange(event) {
+    // Retrieve value from event
+    const value = event.target.checked;
+    // Update state with new value
+    let newState = { ...this.state };
+    newState.soundFilters.onlyOnPhone = value;
+    this.setState(newState);
+  }
+
   handleOnlySelectedChange(event) {
     // Retrieve value from event
     const value = event.target.checked;
@@ -137,10 +150,10 @@ class SoundSelector extends React.Component {
     const lowercaseLocationSearch = this.state.soundFilters.locationSearch.toLowerCase();
     const lowercaseDescriptionSearch = this.state.soundFilters.descriptionSearch.toLowerCase();
     return this.state.sounds.filter(sound => {
+      // Filter by onlyOnPhone
+      if (this.state.soundFilters.onlyOnPhone && !sound.onPhone) return false;
       // Filter by onlySelected
-      if (this.state.soundFilters.onlySelected && !sound.selected) {
-        return false;
-      }
+      if (this.state.soundFilters.onlySelected && !sound.selected) return false;
       // Filter by location search
       if (
         lowercaseLocationSearch.length > 0 &&
@@ -160,6 +173,59 @@ class SoundSelector extends React.Component {
     });
   }
 
+  handleOnPhoneChange(event, sound) {
+    // Retrieve value from event
+    const value = event.target.checked;
+    if (value) {
+      this.setOnPhone(sound);
+    } else {
+      this.setNotOnPhone(sound);
+    }
+  }
+
+  async setOnPhone(sound) {
+    try {
+      // POST sound to the server
+      const response = await axios.post(
+        process.env.REACT_APP_API_URL + "/sounds",
+        sound,
+        {
+          withCredentials: true
+        }
+      );
+      if (response.status === 200) {
+        // Refresh the list of sounds
+        this.refreshSounds();
+      }
+    } catch (e) {
+      // Update error message in state
+      let newState = { ...this.state };
+      newState.serverError = "Could not set on phone";
+      this._isMounted && this.setState(newState);
+    }
+  }
+
+  async setNotOnPhone(sound) {
+    try {
+      // Send DELETE request to the server
+      const response = await axios.delete(
+        process.env.REACT_APP_API_URL + "/sounds/" + sound.id,
+        {
+          withCredentials: true
+        }
+      );
+      if (response.status === 200) {
+        // Refresh the list of sounds
+        this.refreshSounds();
+      }
+    } catch (e) {
+      // Update error message in the state
+      let newState = { ...this.state };
+      newState.serverError = "Could not set not on phone";
+      this._isMounted && this.setState(newState);
+    }
+  }
+
   handleSelectedChange(event, sound) {
     // Retrieve value from event
     const value = event.target.checked;
@@ -172,10 +238,10 @@ class SoundSelector extends React.Component {
 
   async selectSound(sound) {
     try {
-      // POST sound to the server
+      // POST select sound
       const response = await axios.post(
-        process.env.REACT_APP_API_URL + "/sounds",
-        sound,
+        process.env.REACT_APP_API_URL + "/sounds/" + sound.id + "/select",
+        {},
         {
           withCredentials: true
         }
@@ -194,9 +260,10 @@ class SoundSelector extends React.Component {
 
   async deselectSound(sound) {
     try {
-      // Send DELETE request to the server
-      const response = await axios.delete(
-        process.env.REACT_APP_API_URL + "/sounds/" + sound.id,
+      // POST deselect sound
+      const response = await axios.post(
+        process.env.REACT_APP_API_URL + "/sounds/" + sound.id + "/deselect",
+        {},
         {
           withCredentials: true
         }
@@ -236,6 +303,14 @@ class SoundSelector extends React.Component {
           />
         </label>
         <label>
+          Show only on phone:
+          <input
+            type="checkbox"
+            name="onlyOnPhone"
+            onChange={this.handleOnlyOnPhoneChange}
+          />
+        </label>
+        <label>
           Show only selected:
           <input
             type="checkbox"
@@ -253,6 +328,7 @@ class SoundSelector extends React.Component {
                 <th>Description</th>
                 <th>Category</th>
                 <th>Seconds</th>
+                <th>Downloaded to phone</th>
                 <th>Selected</th>
               </tr>
             </thead>
@@ -269,7 +345,15 @@ class SoundSelector extends React.Component {
                       <td>
                         <input
                           type="checkbox"
+                          checked={sound.onPhone}
+                          onChange={e => this.handleOnPhoneChange(e, sound)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="checkbox"
                           checked={sound.selected}
+                          disabled={!sound.onPhone}
                           onChange={e => this.handleSelectedChange(e, sound)}
                         />
                       </td>
