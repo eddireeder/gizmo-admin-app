@@ -2,6 +2,7 @@ import React from "react";
 import "./Login.css";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
+import config from "../../config";
 
 class Login extends React.Component {
   constructor(props) {
@@ -52,7 +53,7 @@ class Login extends React.Component {
     // Send log in request to the server
     try {
       const response = await axios.post(
-        process.env.REACT_APP_API_URL + "/auth/login",
+        config.apiUrl + "/auth/login",
         {
           username: this.state.formControls.username,
           password: this.state.formControls.password
@@ -63,6 +64,11 @@ class Login extends React.Component {
       );
       // On success, place the returned user object in local storage
       if (response.status === 200) {
+        console.log(process.env);
+        console.log(config.apiUrl + "/auth/login");
+        console.log(response);
+        console.log(response.status);
+        console.log(response.data);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         let newState = { ...this.state };
         newState.authenticated = true;

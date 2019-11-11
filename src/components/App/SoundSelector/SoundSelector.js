@@ -2,6 +2,7 @@ import React from "react";
 import "./SoundSelector.css";
 import axios from "axios";
 import csvtojson from "csvtojson";
+import config from "../../../config";
 
 class SoundSelector extends React.Component {
   constructor(props) {
@@ -104,9 +105,7 @@ class SoundSelector extends React.Component {
   async getSoundsOnPhoneFromServer() {
     try {
       // Make GET request to the server
-      const response = await axios.get(
-        process.env.REACT_APP_API_URL + "/sounds"
-      );
+      const response = await axios.get(config.apiUrl + "/sounds");
       // Return the array of sounds
       return response.data.sounds;
     } catch (e) {
@@ -186,13 +185,9 @@ class SoundSelector extends React.Component {
   async setOnPhone(sound) {
     try {
       // POST sound to the server
-      const response = await axios.post(
-        process.env.REACT_APP_API_URL + "/sounds",
-        sound,
-        {
-          withCredentials: true
-        }
-      );
+      const response = await axios.post(config.apiUrl + "/sounds", sound, {
+        withCredentials: true
+      });
       if (response.status === 200) {
         // Refresh the list of sounds
         this.refreshSounds();
@@ -209,7 +204,7 @@ class SoundSelector extends React.Component {
     try {
       // Send DELETE request to the server
       const response = await axios.delete(
-        process.env.REACT_APP_API_URL + "/sounds/" + sound.id,
+        config.apiUrl + "/sounds/" + sound.id,
         {
           withCredentials: true
         }
@@ -240,7 +235,7 @@ class SoundSelector extends React.Component {
     try {
       // POST select sound
       const response = await axios.post(
-        process.env.REACT_APP_API_URL + "/sounds/" + sound.id + "/select",
+        config.apiUrl + "/sounds/" + sound.id + "/select",
         {},
         {
           withCredentials: true
@@ -262,7 +257,7 @@ class SoundSelector extends React.Component {
     try {
       // POST deselect sound
       const response = await axios.post(
-        process.env.REACT_APP_API_URL + "/sounds/" + sound.id + "/deselect",
+        config.apiUrl + "/sounds/" + sound.id + "/deselect",
         {},
         {
           withCredentials: true

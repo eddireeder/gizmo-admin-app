@@ -3,6 +3,7 @@ import "./Configuration.css";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
 import _ from "lodash";
+import config from "../../../config";
 
 class Configuration extends React.Component {
   constructor(props) {
@@ -76,9 +77,7 @@ class Configuration extends React.Component {
     this._isMounted && this.setState(newState);
     try {
       // Make GET request to the server
-      const response = await axios.get(
-        process.env.REACT_APP_API_URL + "/configuration"
-      );
+      const response = await axios.get(config.apiUrl + "/configuration");
       // Set not loading
       let newState = { ...this.state };
       newState.loading = false;
@@ -102,7 +101,7 @@ class Configuration extends React.Component {
     try {
       // Send POST request to server
       const response = await axios.post(
-        process.env.REACT_APP_API_URL + "/configuration",
+        config.apiUrl + "/configuration",
         configuration,
         {
           withCredentials: true
@@ -138,7 +137,7 @@ class Configuration extends React.Component {
     try {
       // Send POST request to server endpoint
       const response = await axios.post(
-        process.env.REACT_APP_API_URL + "/sounds/regenerateDirections",
+        config.apiUrl + "/sounds/regenerateDirections",
         {},
         {
           withCredentials: true

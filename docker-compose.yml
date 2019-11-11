@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  gizmo-admin-app:
+    build: ./
+    container_name: gizmo-admin-app
+    restart: always
+    ports:
+      - "3001:3000"
+    logging:
+      options:
+        max-size: "50m"
