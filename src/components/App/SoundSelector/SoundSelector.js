@@ -148,7 +148,7 @@ class SoundSelector extends React.Component {
     // Filter by soundFilters
     const lowercaseLocationSearch = this.state.soundFilters.locationSearch.toLowerCase();
     const lowercaseDescriptionSearch = this.state.soundFilters.descriptionSearch.toLowerCase();
-    return this.state.sounds.filter(sound => {
+    let filteredSounds = this.state.sounds.filter(sound => {
       // Filter by onlyOnPhone
       if (this.state.soundFilters.onlyOnPhone && !sound.onPhone) return false;
       // Filter by onlySelected
@@ -170,6 +170,14 @@ class SoundSelector extends React.Component {
       }
       return true;
     });
+    // Limit to 10 if no checkboxes ticked
+    if (
+      !this.state.soundFilters.onlyOnPhone &&
+      !this.state.soundFilters.onlySelected
+    ) {
+      filteredSounds = filteredSounds.slice(0, 10);
+    }
+    return filteredSounds;
   }
 
   handleOnPhoneChange(event, sound) {
@@ -328,33 +336,31 @@ class SoundSelector extends React.Component {
               </tr>
             </thead>
             <tbody>
-              {this.getFilteredSounds()
-                .slice(0, 10)
-                .map((sound, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{sound.location}</td>
-                      <td>{sound.description}</td>
-                      <td>{sound.category}</td>
-                      <td>{sound.secs}</td>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={sound.onPhone}
-                          onChange={e => this.handleOnPhoneChange(e, sound)}
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={sound.selected}
-                          disabled={!sound.onPhone}
-                          onChange={e => this.handleSelectedChange(e, sound)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })}
+              {this.getFilteredSounds().map((sound, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{sound.location}</td>
+                    <td>{sound.description}</td>
+                    <td>{sound.category}</td>
+                    <td>{sound.secs}</td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={sound.onPhone}
+                        onChange={e => this.handleOnPhoneChange(e, sound)}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={sound.selected}
+                        disabled={!sound.onPhone}
+                        onChange={e => this.handleSelectedChange(e, sound)}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
