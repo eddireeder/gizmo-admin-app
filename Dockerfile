@@ -1,6 +1,6 @@
 FROM node:11
 
-WORKDIR /opt/gizmo-admin-app
+WORKDIR /opt/the-sonosynthesiser-admin-app
 
 COPY package*.json ./
 

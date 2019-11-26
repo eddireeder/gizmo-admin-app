@@ -1,9 +1,9 @@
 version: "3"
 
 services:
-  gizmo-admin-app:
+  the-sonosynthesiser-admin-app:
     build: ./
-    container_name: gizmo-admin-app
+    container_name: the-sonosynthesiser-admin-app
     restart: always
     ports:
       - "3001:3000"
