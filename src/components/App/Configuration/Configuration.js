@@ -21,7 +21,9 @@ class Configuration extends React.Component {
         minAngleBetweenSounds: null,
         maxMediaPlayers: null,
         maxIdleSensorDifference: null,
-        maxIdleSeconds: null
+        maxIdleSeconds: null,
+        selectRandomly: null,
+        numRandomlySelected: null
       },
       formControls: {
         primaryAngle: null,
@@ -30,7 +32,9 @@ class Configuration extends React.Component {
         minAngleBetweenSounds: null,
         maxMediaPlayers: null,
         maxIdleSensorDifference: null,
-        maxIdleSeconds: null
+        maxIdleSeconds: null,
+        selectRandomly: null,
+        numRandomlySelected: null
       },
       loading: false
     };
@@ -168,6 +172,16 @@ class Configuration extends React.Component {
     // Retrieve form values from event
     const name = event.target.name;
     const value = event.target.value;
+    // Update configuration state with values
+    let newState = { ...this.state };
+    newState.formControls[name] = value;
+    this.setState(newState);
+  }
+
+  checkboxChangeHandler(event) {
+    // Retrieve form values from event
+    const name = event.target.name;
+    const value = event.target.checked;
     // Update configuration state with values
     let newState = { ...this.state };
     newState.formControls[name] = value;
@@ -314,6 +328,34 @@ class Configuration extends React.Component {
               defaultValue={
                 this.state.configuration
                   ? this.state.configuration.maxIdleSeconds
+                  : null
+              }
+              onChange={this.changeHandler}
+            />
+          </label>
+          <label>
+            Select randomly
+            <input
+              className="input"
+              type="checkbox"
+              name="selectRandomly"
+              defaultChecked={
+                this.state.configuration
+                  ? this.state.configuration.selectRandomly
+                  : false
+              }
+              onChange={this.checkboxChangeHandler}
+            />
+          </label>
+          <label>
+            Num. randomly selected
+            <input
+              className="input"
+              type="number"
+              name="numRandomlySelected"
+              defaultValue={
+                this.state.configuration
+                  ? this.state.configuration.numRandomlySelected
                   : null
               }
               onChange={this.changeHandler}
