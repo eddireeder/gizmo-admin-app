@@ -40,6 +40,7 @@ class Configuration extends React.Component {
     };
     // Bind functions to class
     this.changeHandler = this.changeHandler.bind(this);
+    this.checkboxChangeHandler = this.checkboxChangeHandler.bind(this);
     this.submitForm = this.submitForm.bind(this);
     this.canSubmit = this.canSubmit.bind(this);
     this.regenerateSoundDirections = this.regenerateSoundDirections.bind(this);
@@ -52,10 +53,13 @@ class Configuration extends React.Component {
     const configuration = await this.getConfiguration();
     // Update starting form values and the configuration state
     if (configuration) {
-      // Stringify configuration values
+      // Stringify configuration values (unless boolean)
       let configurationStringified = { ...configuration };
       for (const key in configurationStringified) {
-        if (configurationStringified.hasOwnProperty(key)) {
+        if (
+          configurationStringified.hasOwnProperty(key) &&
+          typeof configurationStringified[key] !== "boolean"
+        ) {
           configurationStringified[key] = configurationStringified[
             key
           ].toString();
@@ -344,7 +348,7 @@ class Configuration extends React.Component {
                   ? this.state.configuration.selectRandomly
                   : false
               }
-              onChange={this.checkboxChangeHandler}
+              onClick={this.checkboxChangeHandler}
             />
           </label>
           <label>
