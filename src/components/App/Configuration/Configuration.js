@@ -43,7 +43,6 @@ class Configuration extends React.Component {
     this.checkboxChangeHandler = this.checkboxChangeHandler.bind(this);
     this.submitForm = this.submitForm.bind(this);
     this.canSubmit = this.canSubmit.bind(this);
-    this.regenerateSoundDirections = this.regenerateSoundDirections.bind(this);
   }
 
   async componentDidMount() {
