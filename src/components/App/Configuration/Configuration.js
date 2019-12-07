@@ -137,41 +137,6 @@ class Configuration extends React.Component {
     }
   }
 
-  async regenerateSoundDirections() {
-    // Set as loading
-    let newState = { ...this.state };
-    newState.loading = true;
-    this._isMounted && this.setState(newState);
-    try {
-      // Send POST request to server endpoint
-      const response = await axios.post(
-        config.apiUrl + "/sounds/regenerateDirections",
-        {},
-        {
-          withCredentials: true
-        }
-      );
-      if (response.status === 200) {
-        // Remove error message, enable button and update state
-        let newState = { ...this.state };
-        newState.loading = false;
-        newState.serverError = "";
-        this._isMounted && this.setState(newState);
-      }
-    } catch (e) {
-      // Log out if unauthorised
-      if (e.response.status === 401) {
-        this.logOut();
-      } else {
-        // Update error message in state
-        let newState = { ...this.state };
-        newState.loading = false;
-        newState.serverError = "Could not regenerate sound directions";
-        this._isMounted && this.setState(newState);
-      }
-    }
-  }
-
   changeHandler(event) {
     // Retrieve form values from event
     const name = event.target.name;
@@ -366,13 +331,6 @@ class Configuration extends React.Component {
             />
           </label>
           <div className="buttons">
-            <button
-              className="input button regenerate-sound-directions"
-              onClick={this.regenerateSoundDirections}
-              disabled={this.state.loading}
-            >
-              Regenerate sound directions
-            </button>
             <input
               className="input save button"
               type="submit"
